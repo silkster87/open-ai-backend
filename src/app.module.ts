@@ -3,13 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OpenaiModule } from './openai/openai.module';
-import { MongooseModule } from '@nestjs/mongoose';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
+    DatabaseModule,
     OpenaiModule,
-    MongooseModule.forRoot('mongodb://localhost/openai'),
   ],
   controllers: [AppController],
   providers: [AppService],
