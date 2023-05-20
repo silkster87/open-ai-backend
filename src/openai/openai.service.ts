@@ -1,11 +1,17 @@
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { CreateOpenaiDto } from './dto/create-openai.dto';
-import { UpdateOpenaiDto } from './dto/update-openai.dto';
+import { Summary } from './schemas/summary.schema';
 import { Configuration, OpenAIApi } from 'openai';
+import { summary } from './mockdata/summary-response';
 
 @Injectable()
 export class OpenaiService {
-  async createSummary(createOpenaiDto: CreateOpenaiDto): Promise<any> {
+  constructor(
+    @InjectModel(Summary.name) private summaryModel: Model<Summary>,
+  ) {}
+  async createSummary(createOpenaiDto: CreateOpenaiDto): Promise<Summary> {
     const configuration = new Configuration({
       apiKey: process.env.OPENAI_API_KEY,
     });
@@ -22,20 +28,21 @@ export class OpenaiService {
       presence_penalty: 0.0,
     });
 
-    // Want to persist the summary into a MongoDB database
-    return response.data;
+    const { text } = response.data.choices[0];
+    const { created } = response.data;
+    //const { text } = summary.choices[0];
+    //const { created } = summary;
+    const createSummaryDto = { text, created };
+
+    const createdSummary = new this.summaryModel(createSummaryDto);
+
+    return createdSummary.save();
+
+    //return summary;
   }
 
-  findAll() {
-    return `This action returns all openai`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} openai`;
-  }
-
-  update(id: number, updateOpenaiDto: UpdateOpenaiDto) {
-    return `This action updates a #${id} openai`;
+  async findAll(): Promise<Summary[]> {
+    return this.summaryModel.find().exec();
   }
 
   remove(id: number) {
