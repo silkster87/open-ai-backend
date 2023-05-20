@@ -4,6 +4,7 @@ import { OpenaiController } from './openai.controller';
 import { OpenaiService } from './openai.service';
 import { Model } from 'mongoose';
 import { Summary } from './schemas/summary.schema';
+import { CreateOpenaiDto } from './dto/create-openai.dto';
 
 describe('OpenaiController', () => {
   let controller: OpenaiController;
@@ -25,6 +26,29 @@ describe('OpenaiController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  describe('create summary', () => {
+    describe('when createSummary is called', () => {
+      let summary: Summary;
+      const createOpenaiDto: CreateOpenaiDto = { text: 'test' };
+      const result = { text: 'test', created: 1684569125 };
+
+      beforeEach(async () => {
+        jest
+          .spyOn(openaiService, 'createSummary')
+          .mockImplementation(() => Promise.resolve(result));
+        summary = await controller.create(createOpenaiDto);
+      });
+
+      test('should create summary', () => {
+        expect(openaiService.createSummary).toBeCalled();
+      });
+
+      test('should return a summary', () => {
+        expect(summary).toBe(result);
+      });
+    });
   });
 
   describe('summaries', () => {
