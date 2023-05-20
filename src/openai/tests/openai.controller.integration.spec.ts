@@ -1,13 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OpenaiController } from '../openai.controller';
 import * as request from 'supertest';
-
+import { OpenaiService } from '../openai.service';
 import { DatabaseService } from '../../database/database.service';
 import { Connection } from 'mongoose';
 import { AppModule } from '../../app.module';
 
 describe('OpenaiController integration tests', () => {
   let controller: OpenaiController;
+  let openaiService: OpenaiService;
   let dbConnection: Connection;
   let httpServer: any;
   let app: any;
@@ -18,6 +19,7 @@ describe('OpenaiController integration tests', () => {
     }).compile();
 
     controller = module.get<OpenaiController>(OpenaiController);
+    openaiService = module.get<OpenaiService>(OpenaiService);
     jest.clearAllMocks();
 
     app = module.createNestApplication();
@@ -47,6 +49,24 @@ describe('OpenaiController integration tests', () => {
       expect(response.status).toBe(200);
       expect(response.body[0].text).toBe(mockData.text);
       expect(response.body[0].created).toBe(mockData.created);
+    });
+  });
+
+  describe('create summary', () => {
+    it('should create summary', async () => {
+      const result = { text: 'test', created: 1684569125 };
+      const mockBody = { text: 'test' };
+      jest
+        .spyOn(openaiService, 'createSummary')
+        .mockImplementation(() => Promise.resolve(result));
+
+      const response = await request(httpServer)
+        .post('/openai')
+        .send(mockBody)
+        .set('Accept', 'application/json');
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual(result);
     });
   });
 });
