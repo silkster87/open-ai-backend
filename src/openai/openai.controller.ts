@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Post,
+  Body,
+} from '@nestjs/common';
 import { OpenaiService } from './openai.service';
 import { CreateOpenaiDto } from './dto/create-openai.dto';
 
@@ -6,15 +13,34 @@ import { CreateOpenaiDto } from './dto/create-openai.dto';
 export class OpenaiController {
   constructor(private readonly openaiService: OpenaiService) {}
 
-  // TODO: posting text to OpenAI to summarize
-  @Post()
-  create(@Body() createOpenaiDto: CreateOpenaiDto) {
-    return this.openaiService.createSummary(createOpenaiDto);
+  throwError(error) {
+    throw new HttpException(
+      {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Request failed',
+      },
+      HttpStatus.BAD_REQUEST,
+      {
+        cause: error,
+      },
+    );
   }
 
-  // TODO: get all the summaries in a MongoDB database
+  @Post()
+  create(@Body() createOpenaiDto: CreateOpenaiDto) {
+    try {
+      return this.openaiService.createSummary(createOpenaiDto);
+    } catch (error) {
+      this.throwError(error);
+    }
+  }
+
   @Get('summaries')
   findAll() {
-    return this.openaiService.findAll();
+    try {
+      return this.openaiService.findAll();
+    } catch (error) {
+      this.throwError(error);
+    }
   }
 }
