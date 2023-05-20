@@ -1,1 +1,3 @@
-export class CreateOpenaiDto {}
+export class CreateOpenaiDto {
+  text: string;
+}
