@@ -7,6 +7,7 @@ import { Summary } from './schemas/summary.schema';
 
 describe('OpenaiController', () => {
   let controller: OpenaiController;
+  let openaiService: OpenaiService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,9 +19,34 @@ describe('OpenaiController', () => {
     }).compile();
 
     controller = module.get<OpenaiController>(OpenaiController);
+    openaiService = module.get<OpenaiService>(OpenaiService);
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  describe('summaries', () => {
+    describe('when findAll is called', () => {
+      let summaries: Summary[];
+
+      const result = [{ text: 'test', created: 1684569125 }];
+
+      beforeEach(async () => {
+        jest
+          .spyOn(openaiService, 'findAll')
+          .mockImplementation(() => Promise.resolve(result));
+        summaries = await controller.findAll();
+      });
+
+      test('should call findAll', () => {
+        expect(openaiService.findAll).toBeCalled();
+      });
+
+      test('expect to get Summaries', () => {
+        expect(summaries).toBe(result);
+      });
+    });
   });
 });
