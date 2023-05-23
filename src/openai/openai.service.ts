@@ -5,7 +5,6 @@ import { CreateOpenaiDto } from './dto/create-openai.dto';
 import { Summary } from './schemas/summary.schema';
 import { Configuration, OpenAIApi } from 'openai';
 import { summary } from './mockdata/summary-response';
-import mongodb from 'mongodb';
 
 @Injectable()
 export class OpenaiService {
@@ -50,6 +49,6 @@ export class OpenaiService {
   }
 
   async remove(id: string) {
-    return this.summaryModel.deleteOne({ _id: new mongodb.ObjectId(id)});
+    return this.summaryModel.deleteOne({ _id: id});
   }
 }
