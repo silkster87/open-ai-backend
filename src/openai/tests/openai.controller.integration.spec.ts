@@ -69,4 +69,25 @@ describe('OpenaiController integration tests', () => {
       expect(response.body).toEqual(result);
     });
   });
+
+  describe('remove summary', () => {
+    
+    it('should remove summary', async () => {
+      const mockBody = { id: '1' }
+      const resultObj = { acknowledged: true, deletedCount: 1 };
+      jest.spyOn(openaiService, 'remove')
+        .mockImplementation(() => Promise.resolve(resultObj));
+      
+      
+      const response = await request(httpServer)
+        .delete('/openai')
+        .send(mockBody)
+        .set('Accept', 'application/json');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(resultObj);
+    })
+
+    
+  });
 });

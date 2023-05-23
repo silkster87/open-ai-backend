@@ -73,4 +73,25 @@ describe('OpenaiController', () => {
       });
     });
   });
+
+  describe('remove summary', () => {
+    const resultObj = { acknowledged: true, deletedCount: 1 };
+
+    let result = {};
+    describe('when remove is called', () => {
+      beforeEach(async () => {
+        jest.spyOn(openaiService, 'remove')
+          .mockImplementation(() => Promise.resolve(resultObj));
+        result = await controller.deleteSummary({ id: '1'});
+      })
+
+      test('returns result object', () => {
+        expect(result).toBe(resultObj);
+      });
+
+      test('remove() called', () => {
+        expect(openaiService.remove).toBeCalledWith('1');
+      })
+    })
+  });
 });
