@@ -5,9 +5,11 @@ import {
   HttpStatus,
   Post,
   Body,
+  Delete,
 } from '@nestjs/common';
 import { OpenaiService } from './openai.service';
 import { CreateOpenaiDto } from './dto/create-openai.dto';
+import { DeleteSummaryDto } from './dto/delete-summary.dto';
 
 @Controller('openai')
 export class OpenaiController {
@@ -39,6 +41,15 @@ export class OpenaiController {
   findAll() {
     try {
       return this.openaiService.findAll();
+    } catch (error) {
+      this.throwError(error);
+    }
+  }
+
+  @Delete()
+  deleteSummary(@Body() deleteSummary: DeleteSummaryDto) {
+    try {
+      return this.openaiService.remove(deleteSummary.id);
     } catch (error) {
       this.throwError(error);
     }
